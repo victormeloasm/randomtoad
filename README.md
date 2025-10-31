@@ -22,7 +22,11 @@
 
 
 
-[![randomtoad.zip](https://img.shields.io/badge/randomtoad.zip-Download-brightgreen?logo=github)](https://github.com/victormeloasm/randomtoad/releases/download/v1/randomtoad.zip)
+<div align="center">
+  <a href="https://github.com/victormeloasm/randomtoad/releases/download/v1/randomtoad.zip">
+    <img src="https://img.shields.io/badge/randomtoad.zip-Download-brightgreen?logo=github" alt="Download randomtoad.zip">
+  </a>
+</div>
 
 
 
