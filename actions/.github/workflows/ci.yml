@@ -22,22 +22,45 @@ jobs:
     defaults:
       run:
         shell: bash
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install deps (clang, lld, fasm, dieharder)
+      - name: Install deps (clang, lld, make, dieharder)  # fasm opcional
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            clang lld make fasm dieharder
+            clang lld make dieharder
+
+      - name: Print toolchain
+        run: |
+          clang --version
+          ld.lld --version || true
+          dieharder -h | head -n1 || true
+
+      - name: Detect CPU features (aes / rdseed)
+        id: cpu
+        run: |
+          set -e
+          FEATS=$(grep -m1 -oE 'aes|rdseed' /proc/cpuinfo | sort -u | tr '\n' ' ')
+          echo "cpu-features: $FEATS"
+          if grep -qi aes /proc/cpuinfo; then echo "HAS_AES=1" >> $GITHUB_ENV; else echo "HAS_AES=0" >> $GITHUB_ENV; fi
+          if grep -qi rdseed /proc/cpuinfo; then echo "HAS_RDSEED=1" >> $GITHUB_ENV; else echo "HAS_RDSEED=0" >> $GITHUB_ENV; fi
 
       - name: Build (default)
         working-directory: ./src
         env:
-          CFLAGS: "-O3 -march=native -maes -mrdseed"
+          CC: clang
+          LD: lld
+          # -march genérico pro runner + AES sempre habilitado; RDSEED só se existir
+          CFLAGS: "-O3 -pipe -fuse-ld=lld -march=x86-64-v2 -maes"
         run: |
-          make -j"$(nproc)"
+          set -e
+          if [ "${HAS_RDSEED}" = "1" ]; then CFLAGS="${CFLAGS} -mrdseed"; fi
+          echo "CFLAGS=${CFLAGS}"
+          # NO_FASM=1 evita tentar montar/ligar os demos ASM no CI
+          make -j"$(nproc)" NO_FASM=1 CFLAGS="${CFLAGS}"
 
       - name: Run selftest (expected: SELFTEST: OK)
         working-directory: ./src
@@ -49,10 +72,14 @@ jobs:
       - name: Build (FIPS mode)
         working-directory: ./src
         env:
-          CFLAGS: "-O3 -march=native -maes -mrdseed"
+          CC: clang
+          LD: lld
+          CFLAGS: "-O3 -pipe -fuse-ld=lld -march=x86-64-v2 -maes"
         run: |
+          set -e
+          if [ "${HAS_RDSEED}" = "1" ]; then CFLAGS="${CFLAGS} -mrdseed"; fi
           make clean
-          make -j"$(nproc)" fips
+          make -j"$(nproc)" fips NO_FASM=1 CFLAGS="${CFLAGS}"
 
       - name: Run selftest (FIPS mode)
         working-directory: ./src
@@ -61,14 +88,12 @@ jobs:
           RT_FIPS_MODE=1 ./build/selftest | tee selftest_fips.log
           grep -q "SELFTEST: OK" selftest_fips.log
 
-      - name: Dieharder smoke (selected tests, short)
+      - name: Dieharder smoke (short & optional)
         working-directory: ./src
-        continue-on-error: true   # não falha o pipeline se não passar/instalar
+        continue-on-error: true
         timeout-minutes: 5
         run: |
           set -e
-          # Testes leves: birthdays(0), operm5(1), rank_32x32(2), monobit(15)
-          # -p 3 reduz psamples; -g 200 lê da stdin (stream_randomtoad)
           ./build/stream_randomtoad | dieharder -g 200 -d 0 -d 1 -d 2 -d 15 -p 3 | tee dieharder_smoke.log
 
       - name: Upload artifacts
@@ -81,3 +106,4 @@ jobs:
             src/selftest.log
             src/selftest_fips.log
             src/dieharder_smoke.log
+          if-no-files-found: warn
