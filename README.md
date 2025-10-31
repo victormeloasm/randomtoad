@@ -22,12 +22,12 @@
 
 <p align="center">
   <a href="https://github.com/victormeloasm/randomtoad/releases/download/v1/randomtoad.zip">
-    <img src="https://img.shields.io/badge/Download-randomtoad.zip-brightgreen?logo=github" alt="Download randomtoad.zip">
+    [![Release](https://img.shields.io/github/v/release/victormeloasm/randomtoad?label=release)](https://github.com/victormeloasm/randomtoad/releases)
   </a>
 </p>
 
 
-[![Release](https://img.shields.io/github/v/release/victormeloasm/randomtoad?label=release)](https://github.com/victormeloasm/randomtoad/releases)
+
 
 ---
 
