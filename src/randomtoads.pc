@@ -1,0 +1,13 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: RandomToad
+Description: CTR_DRBG AES-256 (NIST SP 800-90A Rev.1) C/C++ library
+Version: 2.1.0
+URL: https://github.com/victormeloasm/randomtoad
+Requires:
+Requires.private:
+Libs: -L${libdir} -lrandomtoad
+Cflags: -I${includedir}
