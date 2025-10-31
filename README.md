@@ -1,4 +1,4 @@
-# 🐸 RandomToad — CTR_DRBG AES-256 (NIST SP 800-90A Rev.1)
+# 🐸 RandomToad — CTR_DRBG AES‑256 (NIST SP 800‑90A Rev.1)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](#license)
 ![C](https://img.shields.io/badge/C-17-blue)
@@ -7,16 +7,16 @@
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Ubuntu-lightgrey)
 ![Clang+LLD](https://img.shields.io/badge/toolchain-clang%2Blld-brightgreen)
 ![FASM](https://img.shields.io/badge/FASM-ready-purple)
-![Dieharder](https://img.shields.io/badge/dieharder-APPROVED-brightgreen)
 ![Made with love](https://img.shields.io/badge/made%20with-love-ff69b4)
+[![dieharder](https://img.shields.io/badge/dieharder-APPROVED-brightgreen)](#-dieharder-approved)
 
 <p align="center">
   <img src="assets/wk.png" alt="RandomToad CTR_DRBG (AES-256 CTR_DRBG)" width="420">
 </p>
 
-**RandomToad** is a **C/C++** library for cryptographically secure random number generation based on **CTR_DRBG (AES-256) no_df** as defined in **NIST SP 800-90A Rev.1**, with entropy collection and health tests aligned with **SP 800-90B**, and a **90C** composition layer (optional prediction resistance and periodic reseed). It uses **AES-NI** and avoids blocking on `/dev/urandom` by sourcing from **RDSEED** and `getrandom(GRND_NONBLOCK)` with exponential backoff.
+**RandomToad** is a **C/C++** library for cryptographically secure random number generation based on **CTR_DRBG (AES‑256) no_df** as defined in **NIST SP 800‑90A Rev.1**, with entropy collection and health tests aligned with **SP 800‑90B**, and a **90C** composition layer (optional prediction resistance and periodic reseed). It uses **AES‑NI** and avoids blocking on `/dev/urandom` by sourcing from **RDSEED** and `getrandom(GRND_NONBLOCK)` with exponential backoff.
 
-> 🐸 *Sapic summary:* fast, robust, and easy to integrate — with startup **self-tests** (KAT) and a hardened **FIPS mode** (error latch and integrity checks). Ideal for services, CLIs, and libraries that need a solid DRBG core.
+> 🐸 *Sapic summary:* fast, robust, and easy to integrate — with startup **self‑tests** (KAT) and a hardened **FIPS mode** (error latch and integrity checks). Ideal for services, CLIs, and libraries that need a solid DRBG core.
 
 <p align="center">
   <a href="https://github.com/victormeloasm/randomtoad/releases/download/v1/randomtoad.zip">
@@ -28,13 +28,13 @@
 
 ## ✨ Highlights
 
-- ✅ **CTR_DRBG (AES-256) no_df** — NIST SP 800-90A Rev.1
-- 🔐 **Robust seeding**: **RDSEED** → `getrandom(GRND_NONBLOCK)` (non-blocking, with backoff)
-- 🩺 **Self-tests**: power-up Known-Answer Test (DRBG KAT)
-- 🧪 **Stat tests**: ready stream for **dieharder**, PractRand-friendly
-- 🧯 **FIPS mode**: error latch, power-up self-tests, `RT_FIPS_MODE=1`
+- ✅ **CTR_DRBG (AES‑256) no_df** — NIST SP 800‑90A Rev.1
+- 🔐 **Robust seeding**: **RDSEED** → `getrandom(GRND_NONBLOCK)` (non‑blocking, with backoff)
+- 🩺 **Self‑tests**: power‑up Known‑Answer Test (DRBG KAT)
+- 🧪 **Stat tests**: ready stream for **dieharder**, PractRand‑friendly
+- 🧯 **FIPS mode**: error latch, power‑up self‑tests, `RT_FIPS_MODE=1`
 - ⚙️ **No entropy stalls** (great for containers/early boot)
-- 🧵 **Thread-safe by context**: 1 `rt_ctr_drbg` per thread
+- 🧵 **Thread‑safe by context**: 1 `rt_ctr_drbg` per thread
 - 🧰 Demos in **C**, **C++**, and **FASM**; `make install` for headers + lib
 
 ---
@@ -49,8 +49,8 @@ sudo apt-get install -y clang lld fasm dieharder
 
 ### Clone & build
 ```bash
-git clone https://github.com/victormeloasm/randomtoad.git
-cd randomtoad/src
+git clone https://github.com/<YOUR_USER>/randomtoad-ctr-drbg.git
+cd randomtoad-ctr-drbg/src
 
 make                   # builds everything
 ./build/selftest       # expected: SELFTEST: OK
@@ -65,7 +65,7 @@ make                   # builds everything
 
 ## 🛠️ Make targets
 
-- `make` — Build library + demos. Auto-generates `kat90a_vectors.h` on first build if needed (DRBG KAT).
+- `make` — Build library + demos. Auto‑generates `kat90a_vectors.h` on first build if needed (DRBG KAT).
 - `make fips` — Build with hardened flags for **FIPS mode** (stricter checks/startup).
 - `make strict_kat` — Enable strict AES + DRBG KAT (useful for deterministic environments/CI).
 - `make regen_kat` — Manually regenerate KAT vectors for the DRBG (`kat90a_vectors.h`, 64 bytes).
@@ -79,9 +79,9 @@ Binaries in `./build/`:
 
 ---
 
-## 🔐 Self-test & FIPS mode
+## 🔐 Self‑test & FIPS mode
 
-- **Power-up self-test** (default): validates DRBG (KAT), basic integrity, and init.
+- **Power‑up self‑test** (default): validates DRBG (KAT), basic integrity, and init.
   ```bash
   ./build/selftest
   # SELFTEST: OK
@@ -93,7 +93,7 @@ Binaries in `./build/`:
   # SELFTEST: OK
   ```
 
-- **FIPS mode (compile-time)**: hardens the binary at build time.
+- **FIPS mode (compile‑time)**: hardens the binary at build time.
   ```bash
   make clean && make fips && ./build/selftest
   ```
@@ -139,22 +139,22 @@ int main(void) {
 }
 ```
 
-### 128-bit numbers (hex + decimal)
+### 128‑bit numbers (hex + decimal)
 ```c
 #include <inttypes.h>
 #include <stdio.h>
 #include "randomtoad/ctr_drbg.h"
 
 static void print_u128_hex_dec(uint64_t x[2]) {
-    // hex (big-endian view)
+    // hex (big‑endian view)
     printf("HEX: 0x%016" PRIx64 "%016" PRIx64 "\n", x[0], x[1]);
 
     // decimal via __int128
     __uint128_t v = (((__uint128_t)x[0]) << 64) | x[1];
-    char buf[64]; int p = 63; buf[p] = '\0';
+    char buf[64]; int p = 63; buf[p] = '\\0';
     if (v == 0) { puts("DEC: 0"); return; }
     while (v) { buf[--p] = '0' + (v % 10); v /= 10; }
-    printf("DEC: %s\n", buf + p);
+    printf("DEC: %s\\n", buf + p);
 }
 
 int main(void) {
@@ -175,7 +175,7 @@ int  rt_ctr_drbg_generate_ex(rt_ctr_drbg*, uint8_t* out, size_t outlen, const ui
 int  rt_ctr_drbg_generate_all(rt_ctr_drbg*, uint8_t* out, size_t outlen);
 int  rt_ctr_drbg_generate_u128(rt_ctr_drbg*, uint64_t out[2]);
 void rt_ctr_drbg_uninstantiate(rt_ctr_drbg*);
-int  rt_module_is_error(void);                   // 0=OK; non-zero indicates error latch (FIPS mode)
+int  rt_module_is_error(void);                   // 0=OK; non‑zero indicates error latch (FIPS mode)
 ```
 
 ---
@@ -228,12 +228,12 @@ rt_fasm_u128_gen:
 
 ---
 
-## 🌱 Seeding & Reseed (SP 800-90B / 90C alignment)
+## 🌱 Seeding & Reseed (SP 800‑90B / 90C alignment)
 
 - **Primary source:** `RDSEED` (hardware).
-- **Non-blocking fallback:** `getrandom(GRND_NONBLOCK)` + exponential backoff retries.
+- **Non‑blocking fallback:** `getrandom(GRND_NONBLOCK)` + exponential backoff retries.
 - **Personalization String:** optional to separate instances/services.
-- **Prediction Resistance:** via the 90C-aligned layer (`rng90c_*`), which forces `Reseed()` for PR requests.
+- **Prediction Resistance:** via the 90C‑aligned layer (`rng90c_*`), which forces `Reseed()` for PR requests.
 - **Policies:** periodic reseed based on generation counters/time.
 
 > Containers fresh from boot may return `-EAGAIN` from `getrandom(GRND_NONBLOCK)`; the collector applies backoff and retries without blocking.
@@ -242,7 +242,7 @@ rt_fasm_u128_gen:
 
 ## ⚡ Performance & build tips
 
-- Requires **AES-NI**. Recommended compile flags:
+- Requires **AES‑NI**. Recommended compile flags:
   ```bash
   CFLAGS="-O3 -march=native -maes -mrdseed" make
   ```
@@ -268,16 +268,8 @@ rt_fasm_u128_gen:
 
 ## ✅ DIEHARDER APPROVED
 
-RandomToad’s output stream was tested with **dieharder -a -g 200** and **all tests PASSED**.  
-Throughput reported by dieharder: **~1.12e+08 rands/s** (stdin_input_raw).
-
-> **Command used**
-> ```bash
-> ./build/stream_randomtoad | dieharder -a -g 200
-> ```
-
 <details>
-  <summary><strong>Full dieharder log</strong></summary>
+<summary>Full dieharder output (click to expand)</summary>
 
 ```
 #=============================================================================#
@@ -408,18 +400,10 @@ Preparing to run test 209.  ntuple = 0
 ```
 </details>
 
----
-
-## 🔒 KAT (Known-Answer Test)
-
-- `kat90a_vectors.h` carries the **64-byte** expected output for a fixed DRBG seed.  
-- If you modify the DRBG/AES core or change ISA/flags, regenerate:
-  ```bash
-  make regen_kat
-  git add src/kat90a_vectors.h
-  git commit -m "Update DRBG KAT vectors"
-  ```
-- The **selftest** compares runtime output with KAT; mismatches fail initialization (FIPS mode keeps the error latch set).
+> **Reproduce:**  
+> ```bash
+> ./build/stream_randomtoad | dieharder -a -g 200
+> ```
 
 ---
 
@@ -442,7 +426,7 @@ If you want `pkg-config` or `CMake`, open an issue — v2.2 skeleton is ready.
 ## 🗺️ Repository layout
 
 ```
-randomtoad/
+randomtoad-ctr-drbg/
 ├─ README.md
 ├─ LICENSE
 ├─ .gitignore
