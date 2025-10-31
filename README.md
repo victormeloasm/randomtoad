@@ -17,6 +17,13 @@
 
 > 🐸 *Sapic summary:* fast, robust, and easy to integrate — with startup **self‑tests** (KAT) and a hardened **FIPS mode** (error latch and integrity checks). Ideal for services, CLIs, and libraries that need a solid DRBG core.
 
+
+<p align="center">
+  <a href="https://github.com/victormeloasm/randomtoad/releases/download/v1/randomtoad.zip">
+    <img src="https://img.shields.io/badge/Download-randomtoad.zip-brightgreen?logo=github" alt="Download randomtoad.zip">
+  </a>
+</p>
+
 ---
 
 ## ✨ Highlights
