@@ -22,7 +22,7 @@
 
 
 
-[![Download v1](https://img.shields.io/badge/Download-v1-brightgreen?logo=github&style=for-the-badge)](https://github.com/victormeloasm/randomtoad/releases/download/v1/randomtoad.zip)
+[![Download RandomToad.zip](https://img.shields.io/badge/Download-v1-brightgreen?logo=github&style=for-the-badge)](https://github.com/victormeloasm/randomtoad/releases/download/v1/randomtoad.zip)
 
 
 
