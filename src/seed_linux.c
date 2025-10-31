@@ -1,62 +1,58 @@
-// SPDX-License-Identifier: MIT
-#include "ctr_drbg.h"
-#include <errno.h>
+// seed_linux.c (trecho no topo)
+#include <stdint.h>
 #include <string.h>
+#include <errno.h>
 #include <unistd.h>
-#include <sys/syscall.h>
-#include <linux/random.h>
-#include <immintrin.h>
+#include <sys/random.h>
 #include <cpuid.h>
 
-static int have_rdseed(void) {
-    unsigned eax, ebx, ecx, edx;
-    if (!__get_cpuid_count(7, 0, &eax, &ebx, &ecx, &edx)) return 0;
-    return (ebx & (1u<<18)) ? 1 : 0;
+static int cpu_has_rdseed(void) {
+    unsigned int a, b, c, d;
+    if (!__get_cpuid_max(0, NULL)) return 0;
+    // CPUID.(EAX=7,ECX=0):EBX.RDSEED[bit 18]
+    __cpuid_count(7, 0, a, b, c, d);
+    return ((b >> 18) & 1);
 }
 
-static long sys_getrandom(void *buf, size_t buflen, unsigned int flags) {
-#ifdef SYS_getrandom
-    return syscall(SYS_getrandom, buf, buflen, flags);
+#if defined(__RDSEED__)
+#include <immintrin.h>
+static int try_rdseed64_once(uint64_t *out) {
+    return _rdseed64_step(out) ? 1 : 0;
+}
 #else
-    errno = ENOSYS; return -1;
+static int try_rdseed64_once(uint64_t *out) {
+    (void)out; return 0; // sem -mrdseed: nunca tenta
+}
 #endif
-}
 
-static int rdseed_fill(uint8_t* out, size_t len) {
-    unsigned long long prev = 0; int prev_valid = 0;
-    size_t done = 0;
-    while (done < len) {
-        unsigned long long x;
-        if (_rdseed64_step(&x)) {
-            if (prev_valid && x == prev) continue;
-            prev = x; prev_valid = 1;
-            size_t to_copy = (len - done) < 8 ? (len - done) : 8;
-            memcpy(out + done, &x, to_copy);
-            done += to_copy;
-        } else { asm volatile("pause"); }
+static int fill_from_rdseed(uint8_t *dst, size_t len) {
+    if (!cpu_has_rdseed()) return 0;
+    size_t i = 0;
+    uint64_t w;
+    while (i < len) {
+        if (!try_rdseed64_once(&w)) break;
+        size_t take = (len - i) < 8 ? (len - i) : 8;
+        memcpy(dst + i, &w, take);
+        i += take;
     }
-    return 0;
+    return (int)i; // bytes preenchidos
 }
 
-int rt_system_seed48_nonblocking(uint8_t out48[48]) {
-    if (!rt_aesni_available()) return -ENOSYS;
-    int used = 0;
-    if (have_rdseed()) { rdseed_fill(out48, 48); used = 48; }
-    if (used < 48) {
-        ssize_t r = sys_getrandom(out48 + used, 48 - used, GRND_NONBLOCK);
-        if (r < 0) {
-            if (errno == EAGAIN && used == 0) return -EAGAIN;
-        } else used += (int)r;
+int rt_sys_collect_seed(uint8_t *out48) {
+    // 1) RDSEED (melhor caso)
+    int got = fill_from_rdseed(out48, 48);
+    if (got == 48) return 0;
+
+    // 2) getrandom() non-blocking com backoff leve
+    size_t off = (got > 0 && got < 48) ? (size_t)got : 0;
+    unsigned tries = 0;
+    while (off < 48 && tries < 8) {
+        ssize_t r = getrandom(out48 + off, 48 - off, GRND_NONBLOCK);
+        if (r > 0) off += (size_t)r;
+        else if (errno != EAGAIN && errno != EINTR) break;
+        tries++;
+        // backoff (curtinho)
+        usleep(1000u * tries);
     }
-    return (used >= 48) ? 0 : -EAGAIN;
-}
-
-int rt_ctr_drbg_instantiate_system(rt_ctr_drbg* ctx) {
-    uint8_t seed[48];
-    int rc = rt_system_seed48_nonblocking(seed);
-    if (rc) return rc;
-    rc = rt_ctr_drbg_instantiate_no_df(ctx, seed);
-    volatile uint8_t* p = seed;
-    for (size_t i = 0; i < sizeof(seed); i++) p[i] = 0;
-    return rc;
+    return (off == 48) ? 0 : -1;
 }
