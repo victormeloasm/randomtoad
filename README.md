@@ -9,6 +9,10 @@
 ![FASM](https://img.shields.io/badge/FASM-ready-purple)
 ![Made with love](https://img.shields.io/badge/made%20with-love-ff69b4)
 
+<p align="center">
+  <img src="assets/wk.png" alt="RandomToad CTR_DRBG (AES-256 CTR_DRBG)" width="420">
+</p>
+
 **RandomToad** is a **C/C++** library for cryptographically secure random number generation based on **CTR_DRBG (AES‑256) no_df** as defined in **NIST SP 800‑90A Rev.1**, with entropy collection and health tests aligned with **SP 800‑90B**, and a **90C** composition layer (optional prediction resistance and periodic reseed). It uses **AES‑NI** and avoids blocking on `/dev/urandom` by sourcing from **RDSEED** and `getrandom(GRND_NONBLOCK)` with exponential backoff.
 
 > 🐸 *Sapic summary:* fast, robust, and easy to integrate — with startup **self‑tests** (KAT) and a hardened **FIPS mode** (error latch and integrity checks). Ideal for services, CLIs, and libraries that need a solid DRBG core.
