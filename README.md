@@ -9,7 +9,8 @@
 ![FASM](https://img.shields.io/badge/FASM-ready-purple)
 ![Made with love](https://img.shields.io/badge/made%20with-love-ff69b4)
 [![dieharder](https://img.shields.io/badge/dieharder-APPROVED-brightgreen)](#-dieharder-approved)
-[![CI](https://github.com/victormeloasm/randomtoad/actions/workflows/ci.yml/badge.svg)]([actions/.github/workflows/ci.yml])
+![CI](https://github.com/victormeloasm/randomtoad/actions/workflows/ci.yml/badge.svg?branch=main)
+
 
 <p align="center">
   <img src="assets/wk.png" alt="RandomToad CTR_DRBG (AES-256 CTR_DRBG)" width="420">
