@@ -268,8 +268,7 @@ rt_fasm_u128_gen:
 
 ## ✅ DIEHARDER APPROVED
 
-<details>
-<summary>Full dieharder output (click to expand)</summary>
+
 
 ```
 #=============================================================================#
@@ -398,7 +397,7 @@ Preparing to run test 208.  ntuple = 0
 Preparing to run test 209.  ntuple = 0
         dab_monobit2|  12|  65000000|       1|0.66243250|  PASSED  
 ```
-</details>
+
 
 > **Reproduce:**  
 > ```bash
