@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    env:
+      CC: clang
+      CXX: clang++
+      # Mantém FASM opcional no CI (precisa do suporte no Makefile: NO_FASM)
+      NO_FASM: "1"
+      CFLAGS: "-O3 -Wall -Wextra -fPIC -maes"
+      LDFLAGS: "-fuse-ld=lld"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld make dieharder
+
+      - name: Build
+        working-directory: src
+        run: |
+          make V=1 NO_FASM=${NO_FASM} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}"
+
+      - name: Selftest (normal)
+        working-directory: src
+        run: ./build/selftest
+
+      - name: Selftest (FIPS mode)
+        working-directory: src
+        run: RT_FIPS_MODE=1 ./build/selftest
+
+      # Smoke test estatístico curto — não bloqueia o CI
+      - name: dieharder smoke (non-blocking)
+        if: ${{ always() }}
+        continue-on-error: true
+        working-directory: src
+        run: |
+          ./build/stream_randomtoad | head -c 20000000 | dieharder -a -g 200 -k 2
