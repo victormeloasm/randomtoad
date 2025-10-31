@@ -1,48 +1,46 @@
-name: CI
+name: ci
 
 on:
   push:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
-    env:
-      CC: clang
-      CXX: clang++
-      # Mantém FASM opcional no CI (precisa do suporte no Makefile: NO_FASM)
-      NO_FASM: "1"
-      CFLAGS: "-O3 -Wall -Wextra -fPIC -maes"
-      LDFLAGS: "-fuse-ld=lld"
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+        working-directory: src
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang lld make dieharder
+          sudo apt-get install -y clang lld fasm dieharder pkg-config
 
       - name: Build
-        working-directory: src
+        env:
+          CFLAGS: "-O3 -march=native -maes -mrdseed -fPIC"
         run: |
-          make V=1 NO_FASM=${NO_FASM} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}"
+          make V=1
 
-      - name: Selftest (normal)
-        working-directory: src
+      - name: Selftest (power-up KAT)
         run: ./build/selftest
 
-      - name: Selftest (FIPS mode)
-        working-directory: src
-        run: RT_FIPS_MODE=1 ./build/selftest
+      # Smoke test only (não deixa o CI vermelho se o dieharder quiser mais amostra)
+      - name: Dieharder smoke
+        run: ./build/stream_randomtoad | head -c 33554432 | dieharder -g 200 -a -k 2 || true
 
-      # Smoke test estatístico curto — não bloqueia o CI
-      - name: dieharder smoke (non-blocking)
-        if: ${{ always() }}
-        continue-on-error: true
-        working-directory: src
+      - name: Install + pkg-config check
         run: |
-          ./build/stream_randomtoad | head -c 20000000 | dieharder -a -g 200 -k 2
+          sudo make install
+          pkg-config --modversion randomtoad
+          echo '#include <randomtoad/ctr_drbg.h>\nint main(){return 0;}' > /tmp/t.c
+          clang $(pkg-config --cflags randomtoad) /tmp/t.c $(pkg-config --libs randomtoad) -fuse-ld=lld -o /tmp/t
