@@ -26,6 +26,9 @@
   </a>
 </p>
 
+
+[![Release](https://img.shields.io/github/v/release/victormeloasm/randomtoad?label=release)](https://github.com/victormeloasm/randomtoad/releases)
+
 ---
 
 ## ✨ Highlights
